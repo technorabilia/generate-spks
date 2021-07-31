@@ -1,0 +1,105 @@
+{% from "common.j2" import exc_param_volumes %}
+{
+    "docker": {
+        "services": [
+            {
+                "service": "{{ project_vars.project_name }}-docker",
+                "image": "ghcr.io/{{ project_vars.lsio_project_name_short }}/{{ project_vars.project_name }}",
+                "container_name": "sonarr-docker",
+                "tag": "latest",
+                "restart": "always",
+{% if project_vars.common_param_env_vars_enabled or project_vars.param_usage_include_env or project_vars.opt_param_usage_include_env %}
+                "environment": [
+{% endif %}
+{% if project_vars.common_param_env_vars_enabled is sameas true %}
+{% for item in project_vars.common_param_env_vars %}
+                    {
+                        "env_var": "{{ item.env_var }}",
+                        "env_value": "{{ item.env_value | replace('"', "'") }}"
+                    }{{ "," if not loop.last or project_vars.param_usage_include_env or project_vars.opt_param_usage_include_env else "" }}
+{% endfor %}
+{% elif project_vars.common_param_env_vars_enabled == 'optional' %}
+{% for item in project_vars.common_param_env_vars %}
+                    {
+                        "env_var": "{{ item.env_var }}",
+                        "env_value": "{{ item.env_value | replace('"', "'") }}"
+                    }{{ "," if not loop.last or project_vars.param_usage_include_env  or project_vars.opt_param_usage_include_env else "" }}
+{% endfor %}
+{% endif %}
+{% if project_vars.param_usage_include_env %}
+{% for item in project_vars.param_env_vars %}
+                    {
+                        "env_var": "{{ item.env_var }}",
+                        "env_value": "{{ item.env_value | replace('"', "'") }}"
+                    }{{ "," if not loop.last or project_vars.opt_param_usage_include_env else "" }}
+{% endfor %}
+{% endif %}
+{% if project_vars.opt_param_usage_include_env %}
+{% for item in project_vars.opt_param_env_vars %}
+                    {
+                        "env_var": "{{ item.env_var }}",
+                        "env_value": "{{ item.env_value | replace('"', "'") }}"
+                    }{{ "," if not loop.last else "" }}
+{% endfor %}
+{% endif %}
+{% if project_vars.common_param_env_vars_enabled or project_vars.param_usage_include_env or project_vars.opt_param_usage_include_env %}
+            ],
+{% endif %}
+{% if project_vars.param_usage_include_vols or project_vars.opt_param_usage_include_vols %}
+                "shares": [
+{% endif %}
+{% if project_vars.param_usage_include_vols %}
+{% for item in project_vars.param_volumes %}
+                    {
+                        "host_dir": "{{ item.vol_path }}",
+{% if item.vol_path in exc_param_volumes %}
+                        "mount_point": "{{ item.vol_path }}"
+{% else %}
+                        "mount_point": "{{ item.vol_path }}"
+{% endif %}
+                    }{{ "," if not loop.last or project_vars.opt_param_usage_include_vols else "" }}
+{% endfor %}
+{% endif %}
+{% if project_vars.opt_param_usage_include_vols %}
+{% for item in project_vars.opt_param_volumes %}
+                    {
+                        "host_dir": "{{ item.vol_path }}",
+{% if item.vol_path in exc_param_volumes  %}
+                        "mount_point": "{{ item.vol_path }}"
+{% else %}
+                        "mount_point": "{{ item.vol_path }}"
+{% endif %}
+                    }{{ "," if not loop.last else "" }}
+{% endfor %}
+{% endif %}
+{% if project_vars.param_usage_include_vols or project_vars.opt_param_usage_include_vols %}
+                ],
+{% endif %}
+{% if project_vars.param_usage_include_ports or project_vars.opt_param_usage_include_ports %}
+                "ports": [
+{% endif %}
+{% if project_vars.param_usage_include_ports %}
+{% for item in project_vars.param_ports %}
+                    {
+                        "host_port": "{{ item.external_port }}",
+                        "container_port": "{{ item.internal_port }}",
+                        "protocol": "{% if item.internal_port | int != 0 %}tcp{% else %}udp{% endif %}"
+                    }{{ "," if not loop.last or project_vars.opt_param_usage_include_ports else "" }}
+{% endfor %}
+{% endif %}
+{% if project_vars.opt_param_usage_include_ports %}
+{% for item in project_vars.opt_param_ports %}
+                    {
+                        "host_port": "{{ item.external_port }}",
+                        "container_port": "{{ item.internal_port }}",
+                        "protocol": "{% if item.internal_port | int != 0 %}tcp{% else %}udp{% endif %}"
+                    }{{ "," if not loop.last else "" }}
+{% endfor %}
+{% endif %}
+{% if project_vars.param_usage_include_ports or project_vars.opt_param_usage_include_ports %}
+                ]
+{% endif %}
+            }
+        ]
+    }
+}
