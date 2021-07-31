@@ -43,7 +43,7 @@
 {% endfor %}
 {% endif %}
 {% if project_vars.common_param_env_vars_enabled or project_vars.param_usage_include_env or project_vars.opt_param_usage_include_env %}
-            ],
+                ],
 {% endif %}
 {% if project_vars.param_usage_include_vols or project_vars.opt_param_usage_include_vols %}
                 "shares": [
@@ -51,7 +51,7 @@
 {% if project_vars.param_usage_include_vols %}
 {% for item in project_vars.param_volumes %}
                     {
-                        "host_dir": "{{ item.vol_path }}",
+                        "host_dir": "{{ item.vol_path[1:] }}",
 {% if item.vol_path in exc_param_volumes %}
                         "mount_point": "{{ item.vol_path }}"
 {% else %}
@@ -63,7 +63,7 @@
 {% if project_vars.opt_param_usage_include_vols %}
 {% for item in project_vars.opt_param_volumes %}
                     {
-                        "host_dir": "{{ item.vol_path }}",
+                        "host_dir": "{{ item.vol_path[1:] }}",
 {% if item.vol_path in exc_param_volumes  %}
                         "mount_point": "{{ item.vol_path }}"
 {% else %}
