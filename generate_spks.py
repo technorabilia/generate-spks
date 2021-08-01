@@ -84,9 +84,9 @@ response = requests.get(image_url)
 response_json = response.json()
 project_list = response_json["data"]["repositories"]["linuxserver"]
 
-# testing
-project_list = list(
-    filter(lambda project: project["name"] == "sonarr", project_list))
+# # testing
+# project_list = list(
+#     filter(lambda project: project["name"] == "sonarr", project_list))
 
 project_list = list(
     filter(lambda project: project["deprecated"] == False, project_list))
